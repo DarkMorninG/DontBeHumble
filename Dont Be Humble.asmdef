@@ -1,6 +1,6 @@
 {
     "name": "DontBeHumble",
-    "rootNamespace": "",
+    "rootNamespace": "DBH",
     "references": [
         "Vault",
         "UniTask",

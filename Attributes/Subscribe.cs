@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
-namespace Attributes {
+namespace DBH.Attributes {
     [AttributeUsage(AttributeTargets.Method)]
     [MeansImplicitUse]
     public class Subscribe : Attribute {

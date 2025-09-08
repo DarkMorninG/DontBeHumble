@@ -1,7 +1,7 @@
 // using NSubstitute;
 // using NUnit.Framework;
 
-namespace TestEnvs {
+namespace DBH.TestEnvs {
 #pragma warning disable 0649
     public class DBHUnitTest {
         // private readonly List<GameObject> _createdGameObjects = new List<GameObject>();

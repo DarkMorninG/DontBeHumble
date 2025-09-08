@@ -1,9 +1,9 @@
-using Attributes;
-using Base;
-using Injection;
+using DBH.Attributes;
+using DBH.Base;
+using DBH.Injection;
 using UnityEngine;
 
-namespace Controllers {
+namespace DBH.Controllers {
     [Controller]
     public class GameObjectDispatcher : DBHMono, IGameObjectDispatcher {
         public new GameObject CreateGameObject(GameObject tobeCreated) {

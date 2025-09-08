@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Attributes;
-using Exception;
-using Injection.dto;
+using DBH.Attributes;
+using DBH.Exception;
+using DBH.Injection.dto;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Injection {
+namespace DBH.Injection {
     public class Injector {
         public static void InjectField<T>(object toBeInjected, HashSet<Injectable> injectables) {
             if (toBeInjected == null) return;

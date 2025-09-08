@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Attributes;
-using Injection;
-using Injection.dto;
+using DBH.Attributes;
+using DBH.Injection;
+using DBH.Injection.dto;
 using UnityEngine;
 
-namespace Adapter {
+namespace DBH.Adapter {
     public class InjectionContext {
         private readonly HashSet<Injectable> _controllersAndBeans;
 

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Attributes {
+namespace DBH.Attributes {
     [AttributeUsage(AttributeTargets.Class)]
     [BaseTypeRequired(typeof(MonoBehaviour))]
     [InjectionScanned]

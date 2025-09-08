@@ -1,4 +1,4 @@
-namespace Injection.dto {
+namespace DBH.Injection.dto {
     public class Injectable {
         private readonly object _inject;
         private readonly bool _proto;

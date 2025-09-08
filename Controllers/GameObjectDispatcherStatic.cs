@@ -1,7 +1,7 @@
-using Injection;
+using DBH.Injection;
 using UnityEngine;
 
-namespace Controllers {
+namespace DBH.Controllers {
     public class GameObjectDispatcherStatic  {
         public static GameObject CreateGameObject(GameObject tobeCreated) {
             return DependencyInjector.InjectGameObject(Object.Instantiate(tobeCreated));

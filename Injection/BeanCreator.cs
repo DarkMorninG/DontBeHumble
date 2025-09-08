@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Exception;
-using Injection.dto;
+using DBH.Exception;
+using DBH.Injection.dto;
 using Vault;
 
-namespace Injection {
+namespace DBH.Injection {
     public static class BeanCreator {
         public static List<Injectable> InstantiateBeans(IEnumerable<Type> beanTypesInAssembly,
             IEnumerable<Injectable> injectables) {

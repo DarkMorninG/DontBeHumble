@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
-using Attributes;
-using Controllers;
-using Injection;
+using DBH.Attributes;
+using DBH.Controllers;
+using DBH.Injection;
 using UnityEngine;
 using Vault;
 
-namespace Base {
+namespace DBH.Base {
 #pragma warning disable 0649
     [InjectionScanned]
     public class DBHMono : MonoBehaviour {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Controllers {
+namespace DBH.Controllers {
     public class ComponentMockController : IComponentController {
         private static readonly Dictionary<Type, object> Components = new Dictionary<Type, object>();
 

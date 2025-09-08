@@ -1,7 +1,7 @@
 using System.Reflection;
 using UnityEngine;
 
-namespace Util {
+namespace DBH.Util {
     public class UnityFunctions {
         public static void Start(Component component) {
             foreach (var methodInfo in component.GetType()

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Adapter;
-using Attributes;
-using Controllers;
-using Injection.dto;
+using DBH.Adapter;
+using DBH.Attributes;
+using DBH.Controllers;
+using DBH.Injection.dto;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vault;
 using Vault.BetterCoroutine;
 using Object = UnityEngine.Object;
 
-namespace Injection {
+namespace DBH.Injection {
     [DisallowMultipleComponent]
     public class DependencyInjector : MonoBehaviour {
         [SerializeField]

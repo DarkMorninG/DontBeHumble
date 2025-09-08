@@ -1,8 +1,8 @@
-using Attributes;
-using Injection;
+using DBH.Attributes;
+using DBH.Injection;
 using UnityEngine;
 
-namespace Controllers {
+namespace DBH.Controllers {
     [Controller]
     public class ComponentController : MonoBehaviour, IComponentController {
         public T GetComponentFromGameObject<T>(GameObject toAttachTo) {

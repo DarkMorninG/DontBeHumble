@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Base;
-using Controllers;
+using DBH.Base;
+using DBH.Controllers;
 using UnityEngine;
 using Vault.BetterCoroutine;
 
-namespace ObjectPools {
+namespace DBH.ObjectPools {
     public class ObjectPooler : DBHMono {
         private static Dictionary<string, ObjectPool> objectPools = new();
 

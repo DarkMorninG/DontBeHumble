@@ -1,8 +1,8 @@
-﻿using Base;
-using Injection;
+﻿using DBH.Base;
+using DBH.Injection;
 using UnityEngine;
 
-namespace Util
+namespace DBH.Util
 {
     public class DDOL : DBHMono {
         private static DDOL _instance;

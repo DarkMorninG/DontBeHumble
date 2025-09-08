@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Controllers {
+namespace DBH.Controllers {
     public interface IGameObjectDispatcher {
         GameObject CreateGameObject(GameObject tobeCreated);
         GameObject CreateGameObject(GameObject tobeCreated, Transform parent);

@@ -1,4 +1,4 @@
-namespace Util {
+namespace DBH.Util {
     public static class GameObjectExtension {
         // [Grab]
         // private static IComponentController _componentController;

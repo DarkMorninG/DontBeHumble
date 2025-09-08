@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Base;
-using Controllers;
+using DBH.Base;
+using DBH.Controllers;
 using UnityEngine;
 
-namespace ObjectPools {
+namespace DBH.ObjectPools {
     public class ObjectPool {
         private string uuid = Guid.NewGuid().ToString();
 

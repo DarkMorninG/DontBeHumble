@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace Attributes {
+namespace DBH.Attributes {
     /// <summary>
     /// Finds MonoBehaviours from Context and injects in to the Field
     /// </summary>
