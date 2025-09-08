@@ -1,0 +1,9 @@
+{
+    "name": "de.dontknow.dontbehumble",
+    "version": "0.9.0",
+    "displayName": "Dont Be Humble",
+    "author": { "name": "DarkMorninG" },
+    "dependencies": {
+        "de.dontknow.vault": "https://github.com/DarkMorninG/Vault.git"
+    }
+}

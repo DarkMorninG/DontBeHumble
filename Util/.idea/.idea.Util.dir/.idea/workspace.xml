@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1f7d0c0a-0e0c-4407-bbf1-dec716d8cc70" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../HierarchyDecorator/Settings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/../../HierarchyDecorator/Settings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../HierarchyDecorator/Settings.asset.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../HierarchyDecorator/Settings.asset.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/GUI PRO Kit - Fantasy RPG/PSD/PSD.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/GUI PRO Kit - Fantasy RPG/Sprites/Component/Icon_EquipmentIcons_(x2)/NoShadow/EquipmentIcons_NoShadow.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/GUI PRO Kit - Fantasy RPG/Sprites/Component/Icon_EquipmentIcons_(x2)/Shadow/EquipmentIcons_Shadow.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/GUI PRO Kit - Fantasy RPG/Sprites/Component/Icon_ItemIcons_(x2)/NoShadow/ItemIcons_NoShadow.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/GUI PRO Kit - Fantasy RPG/Sprites/Component/Icon_ItemIcons_(x2)/Shadow/ItemIcons_Shadow.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/GUI PRO Kit - Fantasy RPG/Sprites/Component/Icon_PictoIcons_(x2)/PictoIcons_(x2).unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 10.5+/HDRP10.5+.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 10.5+/URP 10.5+.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 10/HDRP 10.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 4.10/HDRP 4.10 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 4.10/LWRP 4.10 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 4.10/ShaderGraph (Deprecated)/HDRP_2018.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 4.10/ShaderGraph (Deprecated)/LWRP_2018.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 5.16.1/HDRP 5.16.1 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 5.16.1/LWRP 5.16.1 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 5.16.1/ShaderGraph (Deprecated)/HDRP_2019_1.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 5.16.1/ShaderGraph (Deprecated)/HDRP_5.16.1_2019.1 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 5.16.1/ShaderGraph (Deprecated)/LWRP_2019_1.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 5.16.1/ShaderGraph (Deprecated)/LWRP_5.16.1_2019.1 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 5.7.2/HDRP 5.7.2 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 5.7.2/LWRP 5.7.2 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 6.9.1/HDRP 6.9.1 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 6.9.1/LWRP 6.9.1 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 6.9.2/HDRP 6.9.2 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 6.9.2/LWRP 6.9.2 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 6.9.2/ShaderGraph (Deprecated)/HDRP_2019_2.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 6.9.2/ShaderGraph (Deprecated)/LWRP_2019_2.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 7.1.6/(Amplify) Deprecated/SRP 7.1.5/HDRP 7.1.5 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 7.1.6/(Amplify) Deprecated/SRP 7.1.5/URP 7.1.5 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 7.1.6/HDRP 7.1.6 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 7.1.6/URP 7.1.6 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 7.1.8/HDRP 7.1.8 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Third Party Packages/MTree/SRP/SRP 7.1.8/URP 7.1.8 Amplify.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/../../../ProjectSettings/ProjectSettings.asset" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="2UTnucCyNFtFwfvjysntEmZuqFD" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\Georg\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\DecompilerCache",
+      "C:\\Users\\Georg\\AppData\\Roaming\\JetBrains\\Rider2023.2\\resharper-host\\SourcesCache",
+      "C:\\Users\\Georg\\AppData\\Local\\Symbols\\src"
+    ]
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1f7d0c0a-0e0c-4407-bbf1-dec716d8cc70" name="Changes" comment="" />
+      <created>1692972661742</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1692972661742</updated>
+      <workItem from="1692972663680" duration="16000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>
