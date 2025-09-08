@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace Dont_Be_Humble.Attributes {
+namespace Attributes {
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Method)]
     public class AfterSceneUnLoad : Attribute {

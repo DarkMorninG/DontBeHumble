@@ -1,4 +1,4 @@
-namespace Dont_Be_Humble.Injection {
+namespace Injection.dto {
     public class Injectable {
         private readonly object _inject;
         private readonly bool _proto;

@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Dont_Be_Humble.Exception;
+using Exception;
+using Injection.dto;
 using Vault;
 
-namespace Dont_Be_Humble.Injection {
+namespace Injection {
     public static class BeanCreator {
         public static List<Injectable> InstantiateBeans(IEnumerable<Type> beanTypesInAssembly,
             IEnumerable<Injectable> injectables) {

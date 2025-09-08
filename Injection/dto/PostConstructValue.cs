@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Dont_Be_Humble.Injection {
+namespace Injection.dto {
     public class PostConstructValue {
         private readonly int _priority;
         private readonly MethodInfo _methodToInvoke;

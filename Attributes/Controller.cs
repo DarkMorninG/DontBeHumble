@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Dont_Be_Humble.Attributes {
+namespace Attributes {
     [AttributeUsage(AttributeTargets.Class)]
     [BaseTypeRequired(typeof(MonoBehaviour))]
     [InjectionScanned]

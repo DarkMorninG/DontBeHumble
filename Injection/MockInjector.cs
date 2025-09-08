@@ -1,11 +1,12 @@
 using System.Collections.Generic;
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Controllers;
-using Dont_Be_Humble.TestEnvs;
+using Attributes;
+using Controllers;
+using Injection.dto;
 using NSubstitute.Core;
+using TestEnvs;
 using UnityEngine;
 
-namespace Dont_Be_Humble.Injection {
+namespace Injection {
     public class MockInjector {
         private static readonly HashSet<Injectable> _mocks = new HashSet<Injectable>();
         private static readonly List<Component> _components = new List<Component>();

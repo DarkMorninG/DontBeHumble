@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Controllers;
-using Dont_Be_Humble.Injection;
+using Attributes;
+using Controllers;
+using Injection;
 using UnityEngine;
 using Vault;
 
-namespace Dont_Be_Humble.Base {
+namespace Base {
 #pragma warning disable 0649
     [InjectionScanned]
     public class DBHMono : MonoBehaviour {

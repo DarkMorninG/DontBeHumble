@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Injection;
+using Attributes;
+using Injection;
+using Injection.dto;
 using UnityEngine;
 
-namespace Dont_Be_Humble.Adapter {
+namespace Adapter {
     public class InjectionContext {
         private readonly HashSet<Injectable> _controllersAndBeans;
 

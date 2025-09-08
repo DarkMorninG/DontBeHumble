@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Base;
-using Dont_Be_Humble.Controllers;
-using Dont_Be_Humble.Injection;
+using Base;
+using Controllers;
 using UnityEngine;
 using Vault.BetterCoroutine;
 
-namespace Dont_Be_Humble.ObjectPools {
+namespace ObjectPools {
     public class ObjectPooler : DBHMono {
         private static Dictionary<string, ObjectPool> objectPools = new();
 

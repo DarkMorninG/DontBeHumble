@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Exception;
+using Attributes;
+using Exception;
+using Injection.dto;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Dont_Be_Humble.Injection {
+namespace Injection {
     public class Injector {
         public static void InjectField<T>(object toBeInjected, HashSet<Injectable> injectables) {
             if (toBeInjected == null) return;
@@ -16,17 +17,31 @@ namespace Dont_Be_Humble.Injection {
                 if (HasAttribute<Prototype>(field)) {
                     field.SetValue(toBeInjected, BeanCreator.InstantiateBean(field.FieldType, injectables));
                 } else {
-                    var controller = GetInjectable(field.FieldType, injectables);
-                    if (controller == null) {
-                        throw new InjectionContextMissing(toBeInjected.GetType() +
-                                                          " is Missing controller " +
-                                                          field.FieldType +
-                                                          " look up if it's present in the scene");
-                    }
+                    if (InjectListField<T>(toBeInjected, injectables, field)) continue;
 
-                    field.SetValue(toBeInjected, controller);
+                    InjectSingleField<T>(toBeInjected, injectables, field);
                 }
             }
+        }
+
+        private static bool InjectListField<T>(object toBeInjected, HashSet<Injectable> injectables, FieldInfo field) {
+            if (!field.FieldType.IsGenericType || field.FieldType.GetGenericTypeDefinition() != typeof(List<>)) return false;
+            var objects = GetInjectables(field.FieldType, injectables);
+            field.SetValue(toBeInjected, objects);
+            return true;
+
+        }
+
+        private static void InjectSingleField<T>(object toBeInjected, HashSet<Injectable> injectables, FieldInfo field) {
+            var controller = GetInjectable(field.FieldType, injectables);
+            if (controller == null) {
+                throw new InjectionContextMissing(toBeInjected.GetType() +
+                                                  " is Missing controller " +
+                                                  field.FieldType +
+                                                  " look up if it's present in the scene");
+            }
+
+            field.SetValue(toBeInjected, controller);
         }
 
         public static List<FieldInfo> GetFieldsWithAttribute<T>(object component, bool withInheritance = false) {
@@ -200,22 +215,6 @@ namespace Dont_Be_Humble.Injection {
             return methodInfos;
         }
 
-        public static IEnumerable<MethodInfo> MethodInfos(Injectable injectable) {
-            return injectable.Inject.GetType()
-                .GetMethods(BindingFlags.NonPublic |
-                            BindingFlags.Instance |
-                            BindingFlags.Public |
-                            BindingFlags.FlattenHierarchy);
-        }
-
-        public T getController<T>(IEnumerable<Injectable> injectables) where T : Component {
-            foreach (var controller in injectables.Select(injectable => injectable.Inject)
-                .Where(controller => controller.GetType() == typeof(T)))
-                return (T)controller;
-
-            throw new System.Exception("No " + typeof(T).Name + " attached yet");
-        }
-
         private static object GetInjectable(Type type, HashSet<Injectable> injectables) {
             if (type.IsInterface)
                 foreach (var injectable in injectables) {
@@ -233,6 +232,27 @@ namespace Dont_Be_Humble.Injection {
             }
 
             return null;
+        }
+
+        private static List<object> GetInjectables(Type type, HashSet<Injectable> injectables) {
+            var objects = new List<object>();
+            if (type.IsInterface) {
+                foreach (var injectable in injectables) {
+                    var controller = injectable.Inject;
+                    if (controller.GetType().GetInterfaces().Contains(type)) {
+                        objects.Add(controller);
+                    }
+                }
+            } else {
+                foreach (var injectable in injectables) {
+                    var controller = injectable.Inject;
+                    if (controller.GetType() == type) {
+                        objects.Add(Convert.ChangeType(controller, type));
+                    }
+                }
+            }
+
+            return objects;
         }
 
 

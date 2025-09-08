@@ -1,10 +1,9 @@
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Base;
-using Dont_Be_Humble.Injection;
+using Attributes;
+using Base;
+using Injection;
 using UnityEngine;
-using Vault.BetterCoroutine;
 
-namespace Dont_Be_Humble.Controllers {
+namespace Controllers {
     [Controller]
     public class GameObjectDispatcher : DBHMono, IGameObjectDispatcher {
         public new GameObject CreateGameObject(GameObject tobeCreated) {

@@ -1,8 +1,8 @@
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Injection;
+using Attributes;
+using Injection;
 using UnityEngine;
 
-namespace Dont_Be_Humble.Controllers {
+namespace Controllers {
     [Controller]
     public class ComponentController : MonoBehaviour, IComponentController {
         public T GetComponentFromGameObject<T>(GameObject toAttachTo) {

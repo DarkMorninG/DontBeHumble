@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Dont_Be_Humble.Config {
+namespace Config {
     [Serializable]
     public class Config {
         public List<string> AssemblysToScan { get; set; }

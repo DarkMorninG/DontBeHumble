@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Dont_Be_Humble.Controllers;
-using Dont_Be_Humble.Injection;
 // using NSubstitute;
 // using NUnit.Framework;
-using UnityEngine;
 
-namespace Dont_Be_Humble.TestEnvs {
+namespace TestEnvs {
 #pragma warning disable 0649
     public class DBHUnitTest {
         // private readonly List<GameObject> _createdGameObjects = new List<GameObject>();

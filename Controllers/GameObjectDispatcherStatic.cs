@@ -1,10 +1,7 @@
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Base;
-using Dont_Be_Humble.Injection;
+using Injection;
 using UnityEngine;
-using Vault.BetterCoroutine;
 
-namespace Dont_Be_Humble.Controllers {
+namespace Controllers {
     public class GameObjectDispatcherStatic  {
         public static GameObject CreateGameObject(GameObject tobeCreated) {
             return DependencyInjector.InjectGameObject(Object.Instantiate(tobeCreated));

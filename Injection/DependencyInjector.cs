@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Dont_Be_Humble.Adapter;
-using Dont_Be_Humble.Attributes;
-using Dont_Be_Humble.Controllers;
+using Adapter;
+using Attributes;
+using Controllers;
+using Injection.dto;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vault;
 using Vault.BetterCoroutine;
 using Object = UnityEngine.Object;
 
-namespace Dont_Be_Humble.Injection {
+namespace Injection {
     [DisallowMultipleComponent]
     public class DependencyInjector : MonoBehaviour {
         [SerializeField]

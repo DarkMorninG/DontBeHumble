@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace Dont_Be_Humble.Attributes {
+namespace Attributes {
     /// <summary>
     /// Finds MonoBehaviours from Context and injects in to the Field
     /// </summary>

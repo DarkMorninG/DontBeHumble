@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dont_Be_Humble.Base;
-using Dont_Be_Humble.Controllers;
-using UnityEditor;
+using Base;
+using Controllers;
 using UnityEngine;
 
-namespace Dont_Be_Humble.ObjectPools {
+namespace ObjectPools {
     public class ObjectPool {
         private string uuid = Guid.NewGuid().ToString();
 

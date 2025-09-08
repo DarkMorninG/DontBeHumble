@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace Dont_Be_Humble.Attributes {
+namespace Attributes {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter)]
     [MeansImplicitUse]
 #pragma warning disable 0649
