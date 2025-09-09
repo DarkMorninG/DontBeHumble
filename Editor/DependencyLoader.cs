@@ -16,7 +16,7 @@ namespace DBH.Editor {
         }
 
         public void OnUnityStart() {
-            Events.registeredPackages += EventsOnregisteredPackages;
+            Events.registeringPackages += EventsOnregisteredPackages;
         }
 
         private void EventsOnregisteredPackages(PackageRegistrationEventArgs packageRegistrationEventArgs) {
