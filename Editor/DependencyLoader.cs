@@ -2,8 +2,10 @@
 using System.Linq;
 using UnityEditor;
 using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using Vault;
+using Vault.BetterCoroutine;
 
 namespace DBH.Editor {
     [InitializeOnLoad]
@@ -12,6 +14,7 @@ namespace DBH.Editor {
             new DependencyLoader().OnUnityStart();
             Debug.Log("Git DependencyLoader Started");
         }
+
         public void OnUnityStart() {
             Events.registeredPackages += EventsOnregisteredPackages;
         }
@@ -23,15 +26,18 @@ namespace DBH.Editor {
         }
 
         private void PullDependency(IEnumerable<DependencyInfo> dependencyInfos) {
-            var packageCollection = Client.List()
-                .Result;
+            var listRequest = Client.List();
             var githubDependencies = dependencyInfos
                 .Where(info => info.version.Contains("github.com"))
                 .ToList();
-            packageCollection.Where(info => !githubDependencies.Select(dependencyInfo => dependencyInfo.name).Contains(info.name))
-                .ForEach(info => {
-                    Debug.Log("Found Missing Dependency " + info.version);
-                    Client.Add(info.version);
+            
+            AsyncRuntime.WaitUntil(() => listRequest.IsCompleted,
+                () => {
+                    listRequest.Result.Where(info => !githubDependencies.Select(dependencyInfo => dependencyInfo.name).Contains(info.name))
+                        .ForEach(info => {
+                            Debug.Log("Found Missing Dependency " + info.version);
+                            Client.Add(info.version);
+                        });
                 });
         }
     }
