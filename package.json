@@ -3,9 +3,6 @@
     "version": "0.9.0",
     "displayName": "Dont Be Humble",
     "author": { "name": "DarkMorninG" },
-    "dependencies": {
-        "de.dontknow.vault": "1.0.0"
-    },
     "git-dependencies": [
       "https://github.com/DarkMorninG/Vault.git"
     ]
