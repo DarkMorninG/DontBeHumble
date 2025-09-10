@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -26,10 +27,11 @@ namespace DBH.Injection {
 
         private static bool InjectListField<T>(object toBeInjected, HashSet<Injectable> injectables, FieldInfo field) {
             if (!field.FieldType.IsGenericType || field.FieldType.GetGenericTypeDefinition() != typeof(List<>)) return false;
-            var objects = GetInjectables(field.FieldType, injectables);
-            field.SetValue(toBeInjected, objects);
-            return true;
+            var objects = GetInjectables(field.FieldType.GetGenericArguments()[0], injectables);
+            var typedList = ConvertListToType<T>(field, objects);
 
+            field.SetValue(toBeInjected, typedList);
+            return true;
         }
 
         private static void InjectSingleField<T>(object toBeInjected, HashSet<Injectable> injectables, FieldInfo field) {
@@ -42,6 +44,16 @@ namespace DBH.Injection {
             }
 
             field.SetValue(toBeInjected, controller);
+        }
+
+        private static IList ConvertListToType<T>(FieldInfo field, List<object> objects) {
+            var genericType = field.FieldType.GetGenericArguments()[0];
+            var typedList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(genericType));
+            foreach (var obj in objects) {
+                typedList.Add(obj);
+            }
+
+            return typedList;
         }
 
         public static List<FieldInfo> GetFieldsWithAttribute<T>(object component, bool withInheritance = false) {

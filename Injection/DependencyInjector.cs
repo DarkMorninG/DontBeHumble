@@ -46,7 +46,7 @@ namespace DBH.Injection {
 
         public void StartUp() {
             InjectionFinished = false;
-            currentConfig.AssemblysToScan = assemblyName;
+            currentConfig.AssemblysToScan.AddRange(assemblyName);
             var componentFromScene = GetComponentFromScene(gameObject.scene).ToList();
             RegisterControllers(componentFromScene);
             InstantiateBeans();
@@ -281,7 +281,7 @@ namespace DBH.Injection {
             if (CurrentAssembly.IsNullOrEmpty()) {
                 CurrentAssembly.Clear();
                 CurrentAssembly.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(assembly => currentConfig.AssemblysToScan.Contains(assembly.GetName().Name))
+                    .Where(assembly => currentConfig.AssemblysToScan.Any(s => assembly.GetName().Name.Contains(s)))
                     .ToList());
             }
 
