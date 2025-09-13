@@ -19,7 +19,7 @@ namespace DBH.Injection {
         [SerializeField]
         private List<string> assemblyName;
 
-        private static readonly Dictionary<Type, Action<object>> AfterInjections = new();
+        private static readonly List<AfterInjectionDto> AfterInjections = new();
         private static readonly HashSet<Injectable> Beans = new();
 
         private static readonly HashSet<Injectable> Controllers = new();
@@ -309,10 +309,10 @@ namespace DBH.Injection {
         }
 
         private static void CallAfterInjection() {
-            foreach (var (key, value) in AfterInjections) {
+            foreach (var afterInjection in AfterInjections) {
                 foreach (var controller in GatherInjectables()
-                    .Where(controller => controller.Inject.GetType() == key)) {
-                    value.Invoke((object)controller.Inject);
+                    .Where(controller => controller.Inject.GetType() == afterInjection.Type)) {
+                    afterInjection.Callback.Invoke(controller.Inject);
                 }
             }
             
@@ -334,7 +334,7 @@ namespace DBH.Injection {
         }
 
         public static void Grab<T>(Action<T> afterInjectionFinished) {
-            AfterInjections.Add(typeof(T), o => afterInjectionFinished((T)Convert.ChangeType(o, typeof(T))));
+            AfterInjections.Add(new AfterInjectionDto(typeof(T), o => afterInjectionFinished((T)Convert.ChangeType(o, typeof(T)))));
         }
     }
 }
