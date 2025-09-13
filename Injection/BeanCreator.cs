@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using DBH.Attributes;
 using DBH.Exception;
 using DBH.Injection.dto;
 using Vault;
@@ -29,16 +30,17 @@ namespace DBH.Injection {
             return waitingForConstructBeans;
         }
 
-        
+
         private static IEnumerable<Injectable> CreateBeans(IEnumerable<Type> beanTypesInAssembly,
             HashSet<Injectable> currentInjectables,
             out List<Type> laterBeans) {
             laterBeans = new List<Type>();
             var createdBeans = new List<Injectable>();
 
-            foreach (var beanTypes in beanTypesInAssembly) {
-                var constructorInfos = beanTypes.GetConstructors();
-                if (HasInjectableNeeded(constructorInfos, currentInjectables)) {
+            foreach (var beanType in beanTypesInAssembly) {
+                var constructorInfos = beanType.GetConstructors();
+                var fieldInfos = beanType.GetFields();
+                if (HasInjectableNeeded(constructorInfos, fieldInfos, currentInjectables)) {
                     var instantiateBean = InstantiateWithControllers(constructorInfos, currentInjectables);
                     var injectable = new Injectable(instantiateBean);
                     createdBeans.Add(injectable);
@@ -46,9 +48,9 @@ namespace DBH.Injection {
                 } else {
                     var missingInjectables = MissingInjectables(constructorInfos, currentInjectables);
                     if (missingInjectables.All(type =>
-                            ContainsInBeans(beanTypesInAssembly, type) ||
-                            WaitingForOtherBeans(currentInjectables, type))) {
-                        laterBeans.Add(beanTypes);
+                        ContainsInBeans(beanTypesInAssembly, type) ||
+                        WaitingForOtherBeans(currentInjectables, type))) {
+                        laterBeans.Add(beanType);
                     }
                 }
             }
@@ -58,7 +60,8 @@ namespace DBH.Injection {
 
         private static bool WaitingForOtherBeans(HashSet<Injectable> currentInjectables, Type type) {
             return currentInjectables
-                .Select(injectable => injectable.Inject.GetType()).Contains(type);
+                .Select(injectable => injectable.Inject.GetType())
+                .Contains(type);
         }
 
         private static bool ContainsInBeans(IEnumerable<Type> beanTypesInAssembly, Type toContain) {
@@ -87,32 +90,43 @@ namespace DBH.Injection {
                 var constructorInfoMemberType = constructorInfo.GetParameters();
                 foreach (var parameterInfo in constructorInfoMemberType) {
                     if (ContainsInBeans(injectablesAsTypes, parameterInfo.ParameterType)) {
-                        Injectable controller;
+                        Injectable bean;
                         if (parameterInfo.ParameterType.IsInterface) {
-                            controller = Injector.GetInjectableWithInterface(parameterInfo.ParameterType, injectables);
+                            bean = Injector.GetInjectableWithInterface(parameterInfo.ParameterType, injectables);
                         } else {
-                            controller = injectables.First(injectable => injectable.Inject.GetType() == parameterInfo.ParameterType);
+                            bean = injectables.First(injectable => injectable.Inject.GetType() == parameterInfo.ParameterType);
                         }
 
-                        instantiateParameters.Add(controller);
+                        instantiateParameters.Add(bean);
                     } else {
                         throw new MissingInjectableException("missing Controller to be injected: ",
                             parameterInfo.ParameterType);
                     }
                 }
 
-                return constructorInfo.Invoke(instantiateParameters.Select(injectable => injectable.Inject).ToArray());
+                var instantiateWithDependency = constructorInfo.Invoke(instantiateParameters.Select(injectable => injectable.Inject).ToArray());
+                Injector.InjectField<Grab>(instantiateWithDependency, injectables);
+                return instantiateWithDependency;
             }
 
             throw new BeanConstructionException("Can not Construct Bean");
         }
 
         private static bool HasInjectableNeeded(IEnumerable<ConstructorInfo> constructorInfos,
+            IEnumerable<FieldInfo> fields,
             HashSet<Injectable> injectables) {
-            return constructorInfos
+            var hasConstructorDependency = constructorInfos
                 .SelectMany(constructorInfo => constructorInfo.GetParameters())
                 .All(parameterInfo => ContainsInBeans(injectables.Select(injectable => injectable.Inject.GetType()),
                     parameterInfo.ParameterType));
+
+            var hasFieldDependency = fields
+                .Where(Injector.HasAttribute<Grab>)
+                .Select(fieldinfo => fieldinfo.FieldType.GetGenericTypeDefinition() != typeof(List<>)
+                    ? fieldinfo.FieldType.GetGenericArguments()[0]
+                    : fieldinfo.FieldType)
+                .All(type => ContainsInBeans(injectables.Select(injectable => injectable.Inject.GetType()), type));
+            return hasFieldDependency && hasConstructorDependency;
         }
 
         private static IEnumerable<Type> MissingInjectables(IEnumerable<ConstructorInfo> constructorInfos,
