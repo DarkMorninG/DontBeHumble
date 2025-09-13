@@ -29,7 +29,7 @@ namespace DBH.Injection {
 
         private static Config.Config currentConfig;
 
-        public static bool InjectionFinished { get; private set; } = true;
+        public static bool InjectionFinished { get; private set; }
 
         public delegate void VoidNoParameter();
 
