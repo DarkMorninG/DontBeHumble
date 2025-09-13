@@ -314,6 +314,7 @@ namespace DBH.Injection {
                     .Where(controller => controller.Inject.GetType() == key)) {
                     value.Invoke(controller.Inject as Object);
                 }
+                Beans.Where(injectable => injectable.Inject.GetType() == key).ForEach(injectable => value.Invoke(injectable.Inject as Object));;
             }
         }
 
@@ -332,7 +333,7 @@ namespace DBH.Injection {
             Injector.InjectField<Grab>(component, GatherInjectables());
         }
 
-        public static void GetController<T>(Action<T> afterInjectionFinished) {
+        public static void Grab<T>(Action<T> afterInjectionFinished) {
             AfterInjections.Add(typeof(T), o => afterInjectionFinished((T)Convert.ChangeType(o, typeof(T))));
         }
     }
