@@ -315,7 +315,6 @@ namespace DBH.Injection {
                     afterInjection.Callback.Invoke(controller.Inject);
                 }
             }
-            
         }
 
         public static void FullInject(Component component) {
@@ -334,7 +333,11 @@ namespace DBH.Injection {
         }
 
         public static void Grab<T>(Action<T> afterInjectionFinished) {
-            AfterInjections.Add(new AfterInjectionDto(typeof(T), o => afterInjectionFinished((T)Convert.ChangeType(o, typeof(T)))));
+            if (!InjectionFinished) {
+                AfterInjections.Add(new AfterInjectionDto(typeof(T), o => afterInjectionFinished((T)Convert.ChangeType(o, typeof(T)))));
+            } else {
+                afterInjectionFinished?.Invoke((T)GatherInjectables().First(injectable => injectable.Inject is T).Inject);
+            }
         }
     }
 }
