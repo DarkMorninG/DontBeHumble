@@ -19,7 +19,7 @@ namespace DBH.Injection {
         [SerializeField]
         private List<string> assemblyName;
 
-        private static readonly Dictionary<Type, Action<Object>> AfterInjections = new();
+        private static readonly Dictionary<Type, Action<object>> AfterInjections = new();
         private static readonly HashSet<Injectable> Beans = new();
 
         private static readonly HashSet<Injectable> Controllers = new();
@@ -310,12 +310,12 @@ namespace DBH.Injection {
 
         private static void CallAfterInjection() {
             foreach (var (key, value) in AfterInjections) {
-                foreach (var controller in Controllers
+                foreach (var controller in GatherInjectables()
                     .Where(controller => controller.Inject.GetType() == key)) {
-                    value.Invoke(controller.Inject as Object);
+                    value.Invoke((object)controller.Inject);
                 }
-                Beans.Where(injectable => injectable.Inject.GetType() == key).ForEach(injectable => value.Invoke(injectable.Inject as Object));;
             }
+            
         }
 
         public static void FullInject(Component component) {
