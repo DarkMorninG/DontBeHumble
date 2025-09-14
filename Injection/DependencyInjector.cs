@@ -66,10 +66,12 @@ namespace DBH.Injection {
             InvokeAfterSceneLoading(GatherInjectables());
             CallAfterInjection();
             InjectionFinished = true;
+            Debug.Log("bootstrap finished");
         }
 
 
         public static void InjectScene(Scene scene) {
+            Debug.Log("bootstrap scene: " + scene.name);
             InjectionFinished = false;
             var componentFromScene = GetComponentFromScene(scene).ToList();
             RegisterControllers(componentFromScene);
@@ -78,6 +80,7 @@ namespace DBH.Injection {
             InvokePostConstructMethods(componentFromScene);
             OnFinishedInjection?.Invoke();
             InjectionFinished = true;
+            Debug.Log("bootstrap scene finished: " + scene.name);
         }
 
         private static void AfterSceneUnload(Scene scene) {
