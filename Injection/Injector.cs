@@ -15,7 +15,6 @@ namespace DBH.Injection {
             if (toBeInjected == null) return;
             foreach (var field in GetFieldsOf(toBeInjected)) {
                 if (!HasAttribute<T>(field)) continue;
-                Debug.Log("Injected: " + toBeInjected);
                 if (HasAttribute<Prototype>(field)) {
                     field.SetValue(toBeInjected, BeanCreator.InstantiateBean(field.FieldType, injectables));
                 } else {
