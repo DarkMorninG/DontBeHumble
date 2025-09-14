@@ -53,6 +53,7 @@ namespace DBH.Injection {
         }
 
         public void StartUp() {
+            Debug.Log("bootstrap");
             InjectionFinished = false;
             currentConfig.AssemblysToScan.AddRange(assemblyName);
             var componentFromScene = GetComponentFromScene(gameObject.scene).ToList();
@@ -125,7 +126,10 @@ namespace DBH.Injection {
 
         private static void InstantiateBeans() {
             BeanCreator.InstantiateBeans(GetBeanTypesInAssembly(), GatherInjectables())
-                .ForEach(injectable => Beans.Add(injectable));
+                .ForEach(injectable => {
+                    Beans.Add(injectable);
+                    Debug.Log("registered controller: " + injectable.Inject);
+                });
         }
 
         private static void SubscribeInterfaces(IEnumerable<Object> components = null) {
@@ -209,6 +213,7 @@ namespace DBH.Injection {
 
             foreach (var comp in foundComponents) {
                 Register(comp);
+                Debug.Log("registered controller: " + comp.name);
             }
         }
 
