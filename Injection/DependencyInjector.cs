@@ -43,23 +43,14 @@ namespace DBH.Injection {
         private static void Bootstrap() {
             UnityThread.initUnityThread();
             currentConfig = new Config.Config();
+            AfterInjections.Clear();
+            Beans.Clear();
+            Controllers.Clear();
+            CurrentAssembly.Clear();
+            InjectAdapters.Clear();
             SceneManager.sceneLoaded += (scene, mode) => InjectScene(scene);
             SceneManager.sceneUnloaded += AfterSceneUnload;
-#if UNITY_EDITOR
-            EditorApplication.playModeStateChanged += ResetStatics;
-#endif
         }
-#if UNITY_EDITOR
-        private static void ResetStatics(PlayModeStateChange playModeStateChange) {
-            if (playModeStateChange == PlayModeStateChange.ExitingPlayMode) {
-                AfterInjections.Clear();
-                Beans.Clear();
-                Controllers.Clear();
-                CurrentAssembly.Clear();
-                InjectAdapters.Clear();
-            }
-        }
-#endif
 
         public void StartUp() {
             InjectionFinished = false;
