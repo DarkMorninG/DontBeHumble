@@ -128,7 +128,7 @@ namespace DBH.Injection {
             BeanCreator.InstantiateBeans(GetBeanTypesInAssembly(), GatherInjectables())
                 .ForEach(injectable => {
                     Beans.Add(injectable);
-                    Debug.Log("registered controller: " + injectable.Inject);
+                    Debug.Log("created Beans: " + injectable.Inject);
                 });
         }
 
