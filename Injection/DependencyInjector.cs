@@ -7,9 +7,6 @@ using DBH.Adapter;
 using DBH.Attributes;
 using DBH.Controllers;
 using DBH.Injection.dto;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vault;
@@ -53,25 +50,23 @@ namespace DBH.Injection {
         }
 
         public void StartUp() {
-            Debug.Log("bootstrap");
             InjectionFinished = false;
             currentConfig.AssemblysToScan.AddRange(assemblyName);
-            var componentFromScene = GetComponentFromScene(gameObject.scene).ToList();
-            RegisterControllers(componentFromScene);
+            var components = GetComponentFromScene(gameObject.scene).ToList();
+            components.AddRange(GetComponentFromOpenedScene());
+            RegisterControllers(components);
             InstantiateBeans();
             InjectAdapters.AddRange(FilterInjectorAdapters(Beans));
-            InjectFields<Grab>(componentFromScene);
-            SubscribeInterfaces(componentFromScene);
-            InvokePostConstructMethods(componentFromScene);
+            InjectFields<Grab>(components);
+            SubscribeInterfaces(components);
+            InvokePostConstructMethods(components);
             InvokeAfterSceneLoading(GatherInjectables());
             CallAfterInjection();
             InjectionFinished = true;
-            Debug.Log("bootstrap finished");
         }
 
 
         public static void InjectScene(Scene scene) {
-            Debug.Log("bootstrap scene: " + scene.name);
             InjectionFinished = false;
             var componentFromScene = GetComponentFromScene(scene).ToList();
             RegisterControllers(componentFromScene);
@@ -80,7 +75,6 @@ namespace DBH.Injection {
             InvokePostConstructMethods(componentFromScene);
             OnFinishedInjection?.Invoke();
             InjectionFinished = true;
-            Debug.Log("bootstrap scene finished: " + scene.name);
         }
 
         private static void AfterSceneUnload(Scene scene) {
@@ -114,7 +108,6 @@ namespace DBH.Injection {
             if (component.gameObject.scene.name == "DontDestroyOnLoad") return;
             Controllers.Remove(found);
             Controllers.Add(injectable);
-            Debug.Log("replaced: " + injectable.Inject.GetType());
         }
 
 
@@ -131,7 +124,6 @@ namespace DBH.Injection {
             BeanCreator.InstantiateBeans(GetBeanTypesInAssembly(), GatherInjectables())
                 .ForEach(injectable => {
                     Beans.Add(injectable);
-                    Debug.Log("created Beans: " + injectable.Inject);
                 });
         }
 
@@ -175,7 +167,7 @@ namespace DBH.Injection {
             });
 
             var end = DateTime.Now;
-            // Debug.Log("gather postconstruct methods took: " + (end - start).TotalSeconds);
+            //
 
             infos.RemoveNullItems();
             foreach (var postConstructValue in infos.OrderBy(value => value.Priority)) {
@@ -216,7 +208,6 @@ namespace DBH.Injection {
 
             foreach (var comp in foundComponents) {
                 Register(comp);
-                Debug.Log("registered controller: " + comp.name);
             }
         }
 
@@ -265,6 +256,16 @@ namespace DBH.Injection {
             }
 
             return components;
+        }
+
+        private static IEnumerable<Object> GetComponentFromOpenedScene() {
+            var list = new List<Object>();
+            for (var i = 0; i < SceneManager.loadedSceneCount; i++) {
+                var scene = SceneManager.GetSceneAt(i);
+                list.AddRange(GetComponentFromScene(scene));
+            }
+
+            return list;
         }
 
         private static IEnumerable<Object> GetComponentFromScene(Scene scene) {
