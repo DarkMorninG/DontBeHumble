@@ -7,6 +7,9 @@ using DBH.Adapter;
 using DBH.Attributes;
 using DBH.Controllers;
 using DBH.Injection.dto;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vault;
@@ -42,7 +45,21 @@ namespace DBH.Injection {
             currentConfig = new Config.Config();
             SceneManager.sceneLoaded += (scene, mode) => InjectScene(scene);
             SceneManager.sceneUnloaded += AfterSceneUnload;
+#if UNITY_EDITOR
+            EditorApplication.playModeStateChanged += ResetStatics;
+#endif
         }
+#if UNITY_EDITOR
+        private static void ResetStatics(PlayModeStateChange playModeStateChange) {
+            if (playModeStateChange == PlayModeStateChange.ExitingPlayMode) {
+                AfterInjections.Clear();
+                Beans.Clear();
+                Controllers.Clear();
+                CurrentAssembly.Clear();
+                InjectAdapters.Clear();
+            }
+        }
+#endif
 
         public void StartUp() {
             InjectionFinished = false;
