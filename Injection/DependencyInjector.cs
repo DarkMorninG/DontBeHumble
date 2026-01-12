@@ -122,9 +122,7 @@ namespace DBH.Injection {
 
         private static void InstantiateBeans() {
             BeanCreator.InstantiateBeans(GetBeanTypesInAssembly(), GatherInjectables())
-                .ForEach(injectable => {
-                    Beans.Add(injectable);
-                });
+                .ForEach(injectable => { Beans.Add(injectable); });
         }
 
         private static void SubscribeInterfaces(IEnumerable<Object> components = null) {
@@ -211,12 +209,14 @@ namespace DBH.Injection {
             }
         }
 
-        public static GameObject InjectGameObject(GameObject gameObject, bool async = false) {
+        public static GameObject InjectGameObject(GameObject gameObject, bool withPostConstruct = false, bool async = false) {
             var componentsToInject = new List<Component>();
             componentsToInject.AddRange(gameObject.GetComponentsInChildren<Component>());
             var gatherInjectables = GatherInjectables();
             Parallel.ForEach(componentsToInject, component => OnlyInject(component, gatherInjectables));
-            InvokePostConstructMethods(componentsToInject.Select(component => (Object)component).ToList(), async);
+            if (withPostConstruct) {
+                InvokePostConstructMethods(componentsToInject.Select(component => (Object)component).ToList(), async);
+            }
 
             return gameObject;
         }
