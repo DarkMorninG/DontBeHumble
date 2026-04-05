@@ -86,30 +86,44 @@ namespace DBH.Injection {
             HashSet<Injectable> injectables) {
             var injectablesAsTypes = injectables.Select(injectable => injectable.Inject.GetType()).ToList();
             foreach (var constructorInfo in constructorInfos) {
-                var instantiateParameters = new List<Injectable>();
+                var instantiateParameters = new List<object>();
                 var constructorInfoMemberType = constructorInfo.GetParameters();
                 foreach (var parameterInfo in constructorInfoMemberType) {
-                    if (ContainsInBeans(injectablesAsTypes, parameterInfo.ParameterType)) {
-                        Injectable bean;
-                        if (parameterInfo.ParameterType.IsInterface) {
-                            bean = Injector.GetInjectableWithInterface(parameterInfo.ParameterType, injectables);
-                        } else {
-                            bean = injectables.First(injectable => injectable.Inject.GetType() == parameterInfo.ParameterType);
-                        }
-
-                        instantiateParameters.Add(bean);
+                    if (parameterInfo.ParameterType.GetGenericTypeDefinition() == typeof(List<>)) {
+                        ResolveInjectableListParameter(injectables, parameterInfo, instantiateParameters);
                     } else {
-                        throw new MissingInjectableException("missing Controller to be injected: ",
-                            parameterInfo.ParameterType);
+                        ResolveInjectableParameter(injectables, injectablesAsTypes, parameterInfo.ParameterType, instantiateParameters);
                     }
                 }
 
-                var instantiateWithDependency = constructorInfo.Invoke(instantiateParameters.Select(injectable => injectable.Inject).ToArray());
+                var instantiateWithDependency = constructorInfo.Invoke(instantiateParameters.ToArray());
                 Injector.InjectField<Grab>(instantiateWithDependency, injectables);
                 return instantiateWithDependency;
             }
 
             throw new BeanConstructionException("Can not Construct Bean");
+        }
+
+        private static void ResolveInjectableListParameter(HashSet<Injectable> injectables, ParameterInfo parameterInfo, List<object> instantiateParameters) {
+            var listType = parameterInfo.ParameterType.GetGenericArguments()[0];
+            var injectablesWithList = Injector.GetAllInjectableWithInterface(listType, injectables);
+            instantiateParameters.Add(injectablesWithList.Select(injectable => injectable.Inject).ToList());
+        }
+
+        private static void ResolveInjectableParameter(HashSet<Injectable> injectables,
+            List<Type> injectablesAsTypes,
+            Type type,
+            List<object> instantiateParameters) {
+            if (ContainsInBeans(injectablesAsTypes, type)) {
+                Injectable bean;
+                bean = type.IsInterface
+                    ? Injector.GetInjectableWithInterface(type, injectables)
+                    : injectables.First(injectable => injectable.Inject.GetType() == type);
+
+                instantiateParameters.Add(bean);
+            } else {
+                throw new MissingInjectableException("missing Controller to be injected: ", type);
+            }
         }
 
         private static bool HasInjectableNeeded(IEnumerable<ConstructorInfo> constructorInfos,

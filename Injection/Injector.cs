@@ -277,9 +277,15 @@ namespace DBH.Injection {
         }
 
         public static Injectable GetInjectableWithInterface(Type interfaceToFind, IEnumerable<Injectable> controllers) {
-            var controllerWithInterface =
-                controllers.First(injectable => HasInterface(injectable.Inject, interfaceToFind));
-            return controllerWithInterface;
+            var allInjectableWithInterface = GetAllInjectableWithInterface(interfaceToFind, controllers);
+            if (allInjectableWithInterface.ToList().Count == 1) {
+                return allInjectableWithInterface.First();
+            }
+            throw new UndecidableInjections("" + allInjectableWithInterface.Count() + " injectables found for " + interfaceToFind + "");
+        }
+
+        public static IEnumerable<Injectable> GetAllInjectableWithInterface(Type interfaceToFind, IEnumerable<Injectable> controllers) {
+            return controllers.Where(injectable => HasInterface(injectable.Inject, interfaceToFind));
         }
     }
 }
