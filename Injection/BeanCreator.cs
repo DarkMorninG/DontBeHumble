@@ -125,7 +125,7 @@ namespace DBH.Injection {
                     ? Injector.GetInjectableWithInterface(type, injectables)
                     : injectables.First(injectable => injectable.Inject.GetType() == type);
 
-                instantiateParameters.Add(bean);
+                instantiateParameters.Add(bean.Inject);
             } else {
                 throw new MissingInjectableException("missing Controller to be injected: ", type);
             }
