@@ -90,7 +90,7 @@ namespace DBH.Injection {
                 var constructorInfoMemberType = constructorInfo.GetParameters();
                 foreach (var parameterInfo in constructorInfoMemberType) {
                     if (parameterInfo.ParameterType.GetGenericTypeDefinition() == typeof(List<>)) {
-                        ResolveInjectableListParameter(injectables, parameterInfo, instantiateParameters);
+                        ResolveInjectableListParameter(injectables, parameterInfo.ParameterType, instantiateParameters);
                     } else {
                         ResolveInjectableParameter(injectables, injectablesAsTypes, parameterInfo.ParameterType, instantiateParameters);
                     }
@@ -104,10 +104,15 @@ namespace DBH.Injection {
             throw new BeanConstructionException("Can not Construct Bean");
         }
 
-        private static void ResolveInjectableListParameter(HashSet<Injectable> injectables, ParameterInfo parameterInfo, List<object> instantiateParameters) {
-            var listType = parameterInfo.ParameterType.GetGenericArguments()[0];
+        private static void ResolveInjectableListParameter(HashSet<Injectable> injectables, Type parameterType, List<object> instantiateParameters) {
+            var listType = parameterType.GetGenericArguments()[0];
             var injectablesWithList = Injector.GetAllInjectableWithInterface(listType, injectables);
-            instantiateParameters.Add(injectablesWithList.Select(injectable => injectable.Inject).ToList());
+            var resultList = (System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(listType));
+            foreach (var injectable in injectablesWithList) {
+                resultList.Add(injectable.Inject);
+            }
+
+            instantiateParameters.Add(resultList);
         }
 
         private static void ResolveInjectableParameter(HashSet<Injectable> injectables,
