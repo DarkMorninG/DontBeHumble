@@ -89,7 +89,7 @@ namespace DBH.Injection {
                 var instantiateParameters = new List<object>();
                 var constructorInfoMemberType = constructorInfo.GetParameters();
                 foreach (var parameterInfo in constructorInfoMemberType) {
-                    if (parameterInfo.ParameterType.GetGenericTypeDefinition() == typeof(List<>)) {
+                    if (parameterInfo.ParameterType.IsGenericType && parameterInfo.ParameterType.GetGenericTypeDefinition() == typeof(List<>)) {
                         ResolveInjectableListParameter(injectables, parameterInfo.ParameterType, instantiateParameters);
                     } else {
                         ResolveInjectableParameter(injectables, injectablesAsTypes, parameterInfo.ParameterType, instantiateParameters);
@@ -136,14 +136,14 @@ namespace DBH.Injection {
             HashSet<Injectable> injectables) {
             var hasConstructorDependency = constructorInfos
                 .SelectMany(constructorInfo => constructorInfo.GetParameters())
-                .Select(parameterInfo => parameterInfo.ParameterType.GetGenericTypeDefinition() == typeof(List<>)
+                .Select(parameterInfo => parameterInfo.ParameterType.IsGenericType && parameterInfo.ParameterType.GetGenericTypeDefinition() == typeof(List<>)
                     ? parameterInfo.ParameterType.GetGenericArguments()[0]
                     : parameterInfo.ParameterType)
                 .All(type => ContainsInBeans(injectables.Select(injectable => injectable.Inject.GetType()), type));
 
             var hasFieldDependency = fields
                 .Where(Injector.HasAttribute<Grab>)
-                .Select(fieldinfo => fieldinfo.FieldType.GetGenericTypeDefinition() == typeof(List<>)
+                .Select(fieldinfo => fieldinfo.FieldType.IsGenericType && fieldinfo.FieldType.GetGenericTypeDefinition() == typeof(List<>)
                     ? fieldinfo.FieldType.GetGenericArguments()[0]
                     : fieldinfo.FieldType)
                 .All(type => ContainsInBeans(injectables.Select(injectable => injectable.Inject.GetType()), type));
