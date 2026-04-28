@@ -136,16 +136,14 @@ namespace DBH.Injection {
             HashSet<Injectable> injectables) {
             var hasConstructorDependency = constructorInfos
                 .SelectMany(constructorInfo => constructorInfo.GetParameters())
-                .Select(parameterInfo => parameterInfo.ParameterType.IsGenericType && parameterInfo.ParameterType.GetGenericTypeDefinition() == typeof(List<>)
-                    ? parameterInfo.ParameterType.GetGenericArguments()[0]
-                    : parameterInfo.ParameterType)
+                .Where(parameterInfo => !parameterInfo.ParameterType.IsGenericType)
+                .Select(parameterInfo => parameterInfo.ParameterType)
                 .All(type => ContainsInBeans(injectables.Select(injectable => injectable.Inject.GetType()), type));
 
             var hasFieldDependency = fields
                 .Where(Injector.HasAttribute<Grab>)
-                .Select(fieldinfo => fieldinfo.FieldType.IsGenericType && fieldinfo.FieldType.GetGenericTypeDefinition() == typeof(List<>)
-                    ? fieldinfo.FieldType.GetGenericArguments()[0]
-                    : fieldinfo.FieldType)
+                .Where(fieldinfo => !fieldinfo.FieldType.IsGenericType)
+                .Select(fieldinfo => fieldinfo.FieldType)
                 .All(type => ContainsInBeans(injectables.Select(injectable => injectable.Inject.GetType()), type));
             return hasFieldDependency && hasConstructorDependency;
         }
