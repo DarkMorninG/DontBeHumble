@@ -236,20 +236,6 @@ namespace DBH.Injection {
             return false;
         }
 
-        public static void SubscribeInterface(object component, IEnumerable<Object> components) {
-            foreach (var methodInfo in component.GetType()
-                .GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)) {
-                if (!HasAttribute<Subscribe>(methodInfo)) continue;
-
-                var parameterType = methodInfo.GetParameters()[0].ParameterType;
-                var interfaces = GetComponentsWithInterface(parameterType, components);
-                foreach (var @interface in interfaces) {
-                    object[] parameters = { @interface };
-                    methodInfo.Invoke(component, parameters);
-                }
-            }
-        }
-
         public static T[] GetAttributes<T>(MemberInfo ob) {
             return Array.ConvertAll(ob.GetCustomAttributes(typeof(T), true), item => (T)item);
         }

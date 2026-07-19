@@ -66,7 +66,6 @@ namespace DBH.Injection {
             InstantiateBeans();
             InjectAdapters.AddRange(FilterInjectorAdapters(Beans));
             InjectFields<Grab>(components);
-            SubscribeInterfaces(components);
             InvokePostConstructMethods(components);
             InvokeAfterSceneLoading(GatherInjectables());
             CallAfterInjection();
@@ -79,7 +78,6 @@ namespace DBH.Injection {
             var componentFromScene = GetComponentFromScene(scene).Distinct().ToList();
             RegisterControllers(componentFromScene);
             InjectFields<Grab>(componentFromScene);
-            SubscribeInterfaces(componentFromScene);
             InvokePostConstructMethods(componentFromScene);
             OnFinishedInjection?.Invoke();
             InjectionFinished = true;
@@ -166,13 +164,7 @@ namespace DBH.Injection {
             injectionLookupDirty = false;
             return injectionLookup;
         }
-
-        private static void SubscribeInterfaces(IEnumerable<Object> components = null) {
-            components ??= GetComponentsInScene();
-            foreach (var controller in Controllers) {
-                Injector.SubscribeInterface(controller.Inject, components);
-            }
-        }
+        
 
         private static void InvokeAfterSceneLoading(HashSet<Injectable> injectables) {
             foreach (var injectable in injectables) {
@@ -299,7 +291,6 @@ namespace DBH.Injection {
             HashSet<Injectable> toInject,
             IEnumerable<Object> componentsInScene) {
             Injector.InjectField<Grab>(component, GetInjectionLookup(), toInject);
-            Injector.SubscribeInterface(component, componentsInScene);
         }
 
         private static void OnlyInject(Component toInject,
@@ -426,7 +417,6 @@ namespace DBH.Injection {
 
         public static void FullInject(Component component) {
             Injector.InjectField<Grab>(component, GetInjectionLookup(), GatherInjectables());
-            Injector.SubscribeInterface(component, GetComponentsInScene());
             Injector.InvokeWithAttribute<PostConstruct>(component);
         }
 
