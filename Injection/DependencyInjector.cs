@@ -27,10 +27,13 @@ namespace DBH.Injection {
 
         private static readonly List<Assembly> CurrentAssembly = new();
         private static readonly List<IInjectAdapter> InjectAdapters = new();
+        private static readonly Dictionary<Type, List<(int Order, MethodInfo Method)>> PostConstructCache = new();
+        private static readonly Dictionary<Type, bool> InjectionScannedCache = new();
 
         private static Config.Config currentConfig;
 
         public static bool InjectionFinished { get; private set; }
+
 
         public delegate void VoidNoParameter();
 
@@ -53,7 +56,7 @@ namespace DBH.Injection {
         public void StartUp() {
             InjectionFinished = false;
             currentConfig.AssemblysToScan.AddRange(assemblyName);
-            var components = GetComponentFromScene(gameObject.scene).ToList();
+            var components = GetComponentFromScene(gameObject.scene).Distinct().ToList();
             components.AddRange(GetComponentFromOpenedScene());
             RegisterControllers(components);
             InstantiateBeans();
@@ -69,7 +72,7 @@ namespace DBH.Injection {
 
         public static void InjectScene(Scene scene) {
             InjectionFinished = false;
-            var componentFromScene = GetComponentFromScene(scene).ToList();
+            var componentFromScene = GetComponentFromScene(scene).Distinct().ToList();
             RegisterControllers(componentFromScene);
             InjectFields<Grab>(componentFromScene);
             SubscribeInterfaces(componentFromScene);
@@ -152,15 +155,12 @@ namespace DBH.Injection {
             var toInvoke = new List<Object>();
             toInvoke.AddRange(components ?? GetComponentsInScene());
 
-            toInvoke.RemoveAll(o => !Injector.HasAttribute<InjectionScanned>(o));
+            toInvoke.RemoveAll(o => !IsInjectionScanned(o));
             // toInvoke.RemoveAll(o => o.GetType().BaseType == typeof(ScriptableObject));
             foreach (var o in toInvoke) {
                 if (o == null) continue;
-                foreach (var methodInfo in Injector.GetMethodsOfOnlyBase(o)
-                    .ToList()) {
-                    if (!methodInfo.IsDefined(typeof(PostConstruct), true)) continue;
-                    var postConstruct = Injector.GetAttribute<PostConstruct>(methodInfo);
-                    infos.Add(new PostConstructValue(postConstruct.ExecutionOrder, methodInfo, o));
+                foreach (var postConstruct in GetPostConstructMethods(o.GetType())) {
+                    infos.Add(new PostConstructValue(postConstruct.Order, postConstruct.Method, o));
                 }
             }
 
@@ -181,6 +181,38 @@ namespace DBH.Injection {
                         postConstructValue.MethodToInvoke);
                 }
             }
+        }
+
+        private static bool IsInjectionScanned(Object o) {
+            if (o == null) return false;
+
+            var type = o.GetType();
+            if (InjectionScannedCache.TryGetValue(type, out var cached)) {
+                return cached;
+            }
+
+            var result = type.GetCustomAttributes(typeof(InjectionScanned), true).Length > 0;
+            InjectionScannedCache[type] = result;
+            return result;
+        }
+
+        private static List<(int Order, MethodInfo Method)> GetPostConstructMethods(Type type) {
+            if (PostConstructCache.TryGetValue(type, out var cached)) {
+                return cached;
+            }
+
+            var methods = type
+                .GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+                .Select(method => {
+                    var attr = method.GetCustomAttribute<PostConstruct>(true);
+                    return attr == null ? default : (attr.ExecutionOrder, method);
+                })
+                .Where(entry => entry.method != null)
+                .OrderBy(entry => entry.ExecutionOrder)
+                .ToList();
+
+            PostConstructCache[type] = methods;
+            return methods;
         }
 
         private static HashSet<Injectable> GatherInjectables() {
