@@ -11,31 +11,126 @@ using Object = UnityEngine.Object;
 
 namespace DBH.Injection {
     public class Injector {
+        private static readonly Dictionary<(Type TargetType, Type AttributeType), List<InjectableField>> InjectableFieldCache = new();
+
+        private sealed class InjectableField {
+            public InjectableField(FieldInfo field) {
+                Field = field;
+                IsPrototype = field.IsDefined(typeof(Prototype), true);
+                IsList = field.FieldType.IsGenericType && field.FieldType.GetGenericTypeDefinition() == typeof(List<>);
+                ListElementType = IsList ? field.FieldType.GetGenericArguments()[0] : null;
+            }
+
+            public FieldInfo Field { get; }
+            public bool IsPrototype { get; }
+            public bool IsList { get; }
+            public Type ListElementType { get; }
+        }
+
+        public sealed class InjectionLookup {
+            private readonly Dictionary<Type, object> _byConcreteType = new();
+            private readonly Dictionary<Type, object> _byInterfaceType = new();
+            private readonly Dictionary<Type, List<object>> _allByConcreteType = new();
+            private readonly Dictionary<Type, List<object>> _allByInterfaceType = new();
+
+            public InjectionLookup(IEnumerable<Injectable> injectables) {
+                foreach (var injectable in injectables) {
+                    var inject = injectable.Inject;
+                    if (inject == null) continue;
+
+                    var type = inject.GetType();
+                    AddSingle(_byConcreteType, type, inject);
+                    AddMultiple(_allByConcreteType, type, inject);
+
+                    foreach (var interfaceType in type.GetInterfaces()) {
+                        AddSingle(_byInterfaceType, interfaceType, inject);
+                        AddMultiple(_allByInterfaceType, interfaceType, inject);
+                    }
+                }
+            }
+
+            public object GetSingle(Type type) {
+                if (type.IsInterface && _byInterfaceType.TryGetValue(type, out var interfaceMatch)) {
+                    return interfaceMatch;
+                }
+
+                return _byConcreteType.GetValueOrDefault(type);
+            }
+
+            public List<object> GetAll(Type type) {
+                if (type.IsInterface && _allByInterfaceType.TryGetValue(type, out var interfaceMatches)) {
+                    return interfaceMatches;
+                }
+
+                return _allByConcreteType.TryGetValue(type, out var concreteMatches)
+                    ? concreteMatches
+                    : new List<object>();
+            }
+
+            private static void AddSingle(Dictionary<Type, object> lookup, Type type, object inject) {
+                lookup.TryAdd(type, inject);
+            }
+
+            private static void AddMultiple(Dictionary<Type, List<object>> lookup, Type type, object inject) {
+                if (!lookup.TryGetValue(type, out var matches)) {
+                    matches = new List<object>();
+                    lookup.Add(type, matches);
+                }
+
+                matches.Add(inject);
+            }
+        }
+
+        public static InjectionLookup CreateLookup(HashSet<Injectable> injectables) {
+            return new InjectionLookup(injectables);
+        }
+
         public static void InjectField<T>(object toBeInjected, HashSet<Injectable> injectables) {
+            InjectField<T>(toBeInjected, CreateLookup(injectables), injectables);
+        }
+
+        public static void InjectField<T>(object toBeInjected, InjectionLookup injectionLookup,
+            HashSet<Injectable> injectables) {
             if (toBeInjected == null) return;
-            foreach (var field in GetFieldsOf(toBeInjected)) {
-                if (!HasAttribute<T>(field)) continue;
-                if (HasAttribute<Prototype>(field)) {
+            foreach (var injectableField in GetInjectableFields<T>(toBeInjected.GetType())) {
+                var field = injectableField.Field;
+                if (injectableField.IsPrototype) {
                     field.SetValue(toBeInjected, BeanCreator.InstantiateBean(field.FieldType, injectables));
                 } else {
-                    if (InjectListField<T>(toBeInjected, injectables, field)) continue;
+                    if (InjectListField(toBeInjected, injectionLookup, injectableField)) continue;
 
-                    InjectSingleField<T>(toBeInjected, injectables, field);
+                    InjectSingleField(toBeInjected, injectionLookup, field);
                 }
             }
         }
 
-        private static bool InjectListField<T>(object toBeInjected, HashSet<Injectable> injectables, FieldInfo field) {
-            if (!field.FieldType.IsGenericType || field.FieldType.GetGenericTypeDefinition() != typeof(List<>)) return false;
-            var objects = GetInjectables(field.FieldType.GetGenericArguments()[0], injectables);
-            var typedList = ConvertListToType<T>(field, objects);
+        private static List<InjectableField> GetInjectableFields<T>(Type type) {
+            var key = (type, typeof(T));
+            if (InjectableFieldCache.TryGetValue(key, out var cached)) {
+                return cached;
+            }
 
-            field.SetValue(toBeInjected, typedList);
+            var fields = GetFields(type, new List<FieldInfo>())
+                .Where(field => field.IsDefined(typeof(T), true))
+                .Select(field => new InjectableField(field))
+                .ToList();
+
+            InjectableFieldCache[key] = fields;
+            return fields;
+        }
+
+        private static bool InjectListField(object toBeInjected, InjectionLookup injectionLookup,
+            InjectableField injectableField) {
+            if (!injectableField.IsList) return false;
+            var objects = injectionLookup.GetAll(injectableField.ListElementType);
+            var typedList = ConvertListToType(injectableField.Field, objects);
+
+            injectableField.Field.SetValue(toBeInjected, typedList);
             return true;
         }
 
-        private static void InjectSingleField<T>(object toBeInjected, HashSet<Injectable> injectables, FieldInfo field) {
-            var controller = GetInjectable(field.FieldType, injectables);
+        private static void InjectSingleField(object toBeInjected, InjectionLookup injectionLookup, FieldInfo field) {
+            var controller = injectionLookup.GetSingle(field.FieldType);
             if (controller == null) {
                 throw new InjectionContextMissing(toBeInjected.GetType() +
                                                   " is Missing controller " +
@@ -46,7 +141,7 @@ namespace DBH.Injection {
             field.SetValue(toBeInjected, controller);
         }
 
-        private static IList ConvertListToType<T>(FieldInfo field, List<object> objects) {
+        private static IList ConvertListToType(FieldInfo field, List<object> objects) {
             var genericType = field.FieldType.GetGenericArguments()[0];
             var typedList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(genericType));
             foreach (var obj in objects) {
