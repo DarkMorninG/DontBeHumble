@@ -61,7 +61,7 @@ namespace DBH.Injection {
         public void StartUp() {
             InjectionFinished = false;
             currentConfig.AssemblysToScan.AddRange(assemblyName);
-            var components = GetComponentFromOpenedScene();
+            var components = GetComponentFromScene(gameObject.scene).Concat(GetComponentFromOpenedScene()).ToList();
             RegisterControllers(components);
             InstantiateBeans();
             InjectAdapters.AddRange(FilterInjectorAdapters(Beans));
@@ -302,7 +302,8 @@ namespace DBH.Injection {
             Injector.SubscribeInterface(component, componentsInScene);
         }
 
-        private static void OnlyInject(Component toInject, Injector.InjectionLookup injectionLookup,
+        private static void OnlyInject(Component toInject,
+            Injector.InjectionLookup injectionLookup,
             HashSet<Injectable> injectables) {
             Injector.InjectField<Grab>(toInject, injectionLookup, injectables);
         }
