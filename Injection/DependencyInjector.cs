@@ -7,6 +7,7 @@ using DBH.Adapter;
 using DBH.Attributes;
 using DBH.Controllers;
 using DBH.Injection.dto;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vault;
@@ -153,16 +154,15 @@ namespace DBH.Injection {
 
             toInvoke.RemoveAll(o => !Injector.HasAttribute<InjectionScanned>(o));
             // toInvoke.RemoveAll(o => o.GetType().BaseType == typeof(ScriptableObject));
-            toInvoke.ForEach(o => {
-                if (o == null) return;
-                Injector.GetMethodsOfOnlyBase(o)
-                    .ToList()
-                    .ForEach(methodInfo => {
-                        if (!Injector.HasAttribute<PostConstruct>(methodInfo)) return;
-                        var postConstruct = Injector.GetAttribute<PostConstruct>(methodInfo);
-                        infos.Add(new PostConstructValue(postConstruct.ExecutionOrder, methodInfo, o));
-                    });
-            });
+            foreach (var o in toInvoke) {
+                if (o == null) continue;
+                foreach (var methodInfo in Injector.GetMethodsOfOnlyBase(o)
+                    .ToList()) {
+                    if (!methodInfo.IsDefined(typeof(PostConstruct), true)) continue;
+                    var postConstruct = Injector.GetAttribute<PostConstruct>(methodInfo);
+                    infos.Add(new PostConstructValue(postConstruct.ExecutionOrder, methodInfo, o));
+                }
+            }
 
             var end = DateTime.Now;
             //
