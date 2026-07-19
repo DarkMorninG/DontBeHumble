@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -29,7 +30,9 @@ namespace DBH.Injection {
         private static readonly List<IInjectAdapter> InjectAdapters = new();
         private static readonly Dictionary<Type, List<(int Order, MethodInfo Method)>> PostConstructCache = new();
         private static readonly Dictionary<Type, bool> InjectionScannedCache = new();
+        private static readonly Dictionary<Type, bool> ComponentScanCache = new();
         private static Injector.InjectionLookup injectionLookup;
+        private static bool injectionLookupDirty = true;
 
         private static Config.Config currentConfig;
 
@@ -50,6 +53,7 @@ namespace DBH.Injection {
             Controllers.Clear();
             CurrentAssembly.Clear();
             InjectAdapters.Clear();
+            MarkInjectionLookupDirty();
             SceneManager.sceneLoaded += (scene, mode) => InjectScene(scene);
             SceneManager.sceneUnloaded += AfterSceneUnload;
         }
@@ -57,17 +61,14 @@ namespace DBH.Injection {
         public void StartUp() {
             InjectionFinished = false;
             currentConfig.AssemblysToScan.AddRange(assemblyName);
-            var components = GetComponentFromScene(gameObject.scene).Distinct().ToList();
-            components.AddRange(GetComponentFromOpenedScene());
+            var components = GetComponentFromOpenedScene();
             RegisterControllers(components);
             InstantiateBeans();
             InjectAdapters.AddRange(FilterInjectorAdapters(Beans));
-            var gatherInjectables = GatherInjectables();
-            injectionLookup = Injector.CreateLookup(gatherInjectables);
             InjectFields<Grab>(components);
             SubscribeInterfaces(components);
             InvokePostConstructMethods(components);
-            InvokeAfterSceneLoading(gatherInjectables);
+            InvokeAfterSceneLoading(GatherInjectables());
             CallAfterInjection();
             InjectionFinished = true;
         }
@@ -85,7 +86,10 @@ namespace DBH.Injection {
         }
 
         private static void AfterSceneUnload(Scene scene) {
-            Controllers.RemoveWhere(injectable => injectable.Inject == null);
+            if (Controllers.RemoveWhere(injectable => injectable.Inject == null) > 0) {
+                MarkInjectionLookupDirty();
+            }
+
             InvokeAfterSceneUnLoaded(GatherInjectables());
         }
 
@@ -93,10 +97,12 @@ namespace DBH.Injection {
         public static void Purge() {
             Controllers.Clear();
             Beans.Clear();
+            MarkInjectionLookupDirty();
         }
 
         public static void PurgeControllers() {
             Controllers.Clear();
+            MarkInjectionLookupDirty();
         }
 
         public static void Register(object ob) {
@@ -105,6 +111,7 @@ namespace DBH.Injection {
             Controllers.TryGetValue(injectable, out var found);
             if (found == null) {
                 Controllers.Add(injectable);
+                MarkInjectionLookupDirty();
             } else {
                 ReplaceControllerOnNewScene(found, injectable);
             }
@@ -115,14 +122,16 @@ namespace DBH.Injection {
             if (component.gameObject.scene.name == "DontDestroyOnLoad") return;
             Controllers.Remove(found);
             Controllers.Add(injectable);
+            MarkInjectionLookupDirty();
         }
 
 
         private static void InjectFields<T>(IEnumerable<Object> components = null) {
             components ??= GetComponentsInScene();
             var controllersAndBeans = GatherInjectables();
+            var currentInjectionLookup = GetInjectionLookup();
             foreach (var component in components) {
-                Injector.InjectField<T>(component, injectionLookup, controllersAndBeans);
+                Injector.InjectField<T>(component, currentInjectionLookup, controllersAndBeans);
             }
 
             foreach (var injectAdapter in InjectAdapters) {
@@ -131,8 +140,31 @@ namespace DBH.Injection {
         }
 
         private static void InstantiateBeans() {
+            var beansAdded = false;
             BeanCreator.InstantiateBeans(GetBeanTypesInAssembly(), GatherInjectables())
-                .ForEach(injectable => { Beans.Add(injectable); });
+                .ForEach(injectable => {
+                    if (Beans.Add(injectable)) {
+                        beansAdded = true;
+                    }
+                });
+
+            if (beansAdded) {
+                MarkInjectionLookupDirty();
+            }
+        }
+
+        private static void MarkInjectionLookupDirty() {
+            injectionLookupDirty = true;
+        }
+
+        private static Injector.InjectionLookup GetInjectionLookup() {
+            if (!injectionLookupDirty && injectionLookup != null) {
+                return injectionLookup;
+            }
+
+            injectionLookup = Injector.CreateLookup(GatherInjectables());
+            injectionLookupDirty = false;
+            return injectionLookup;
         }
 
         private static void SubscribeInterfaces(IEnumerable<Object> components = null) {
@@ -236,7 +268,10 @@ namespace DBH.Injection {
         }
 
         private static void RegisterControllers(IEnumerable<Object> components = null) {
-            Controllers.RemoveWhere(injectable => (injectable.Inject as Component)?.gameObject == null);
+            if (Controllers.RemoveWhere(injectable => (injectable.Inject as Component)?.gameObject == null) > 0) {
+                MarkInjectionLookupDirty();
+            }
+
             components ??= GetComponentsInScene();
             var foundComponents = components
                 .Where(Injector.HasAttribute<Controller>)
@@ -251,7 +286,8 @@ namespace DBH.Injection {
             var componentsToInject = new List<Component>();
             componentsToInject.AddRange(gameObject.GetComponentsInChildren<Component>());
             var gatherInjectables = GatherInjectables();
-            Parallel.ForEach(componentsToInject, component => OnlyInject(component, injectionLookup, gatherInjectables));
+            var currentInjectionLookup = GetInjectionLookup();
+            Parallel.ForEach(componentsToInject, component => OnlyInject(component, currentInjectionLookup, gatherInjectables));
             if (withPostConstruct) {
                 InvokePostConstructMethods(componentsToInject.Select(component => (Object)component).ToList(), async);
             }
@@ -262,7 +298,7 @@ namespace DBH.Injection {
         private static void InjectTheUsual(Component component,
             HashSet<Injectable> toInject,
             IEnumerable<Object> componentsInScene) {
-            Injector.InjectField<Grab>(component, injectionLookup, toInject);
+            Injector.InjectField<Grab>(component, GetInjectionLookup(), toInject);
             Injector.SubscribeInterface(component, componentsInScene);
         }
 
@@ -280,7 +316,7 @@ namespace DBH.Injection {
             var unityObjects = Resources.FindObjectsOfTypeAll<ScriptableObject>();
 
             var components = GetComponentsFromGameObjects(gameObjectsInScene);
-            components.AddRangeNoDuplicates(unityObjects.Cast<Object>().ToList());
+            components.Cast<Object>().ToList().AddRangeNoDuplicates(unityObjects.Cast<Object>().ToList());
 
             var loadedScenes = new List<Scene>();
             for (var i = 0; i < SceneManager.sceneCount; i++) {
@@ -310,27 +346,41 @@ namespace DBH.Injection {
         private static IEnumerable<Object> GetComponentFromScene(Scene scene) {
             var gameObjectsInScene = scene.GetRootGameObjects();
             var componentsFromGameObjects = GetComponentsFromGameObjects(gameObjectsInScene);
-            foreach (var gameObject in gameObjectsInScene) {
-                var allChildrenRecursive = gameObject.FindAllChildrenRecursive();
-                componentsFromGameObjects.AddRange(GetComponentsFromGameObjects(allChildrenRecursive));
-            }
-
             return componentsFromGameObjects;
         }
 
+        private static List<Component> GetComponentsFromGameObjects(IEnumerable<GameObject> gameObjectsInScene) {
+            var result = new List<Component>();
+            var buffer = new List<Component>();
 
-        private static List<Object> GetComponentsFromGameObjects(IEnumerable<GameObject> gameObjectsInScene) {
-            var components = new List<Object>();
             foreach (var rootGameObject in gameObjectsInScene) {
-                var toBeScannedComponents = rootGameObject.GetComponents<Component>()
-                    .Where(component => Injector.HasAttribute<InjectionScanned>(component) ||
-                                        Injector.HasAttribute<Controller>(component));
-                foreach (var component in toBeScannedComponents) {
-                    components.AddNotNull(component);
+                buffer.Clear();
+                rootGameObject.GetComponentsInChildren(true, buffer);
+
+                foreach (var component in buffer) {
+                    if (ShouldScan(component)) {
+                        result.Add(component);
+                    }
                 }
             }
 
-            return components;
+            return result;
+        }
+
+        private static bool ShouldScan(Component component) {
+            if (component == null) return false;
+
+            var type = component.GetType();
+            if (ComponentScanCache.TryGetValue(type, out var cached)) {
+                return cached;
+            }
+
+            var result =
+                type.GetCustomAttributes(typeof(InjectionScanned), true).Length > 0 ||
+                type.GetCustomAttributes(typeof(Controller), true).Length > 0;
+
+            ComponentScanCache[type] = result;
+            return result;
         }
 
         private static IEnumerable<Type> GetBeanTypesInAssembly() {
@@ -374,18 +424,18 @@ namespace DBH.Injection {
         }
 
         public static void FullInject(Component component) {
-            Injector.InjectField<Grab>(component, injectionLookup, GatherInjectables());
+            Injector.InjectField<Grab>(component, GetInjectionLookup(), GatherInjectables());
             Injector.SubscribeInterface(component, GetComponentsInScene());
             Injector.InvokeWithAttribute<PostConstruct>(component);
         }
 
         public static void FullInjectIgnoreSubscribe(Component component) {
-            Injector.InjectField<Grab>(component, injectionLookup, GatherInjectables());
+            Injector.InjectField<Grab>(component, GetInjectionLookup(), GatherInjectables());
             Injector.InvokeWithAttribute<PostConstruct>(component);
         }
 
         public static void InjectFields(object component) {
-            Injector.InjectField<Grab>(component, injectionLookup, GatherInjectables());
+            Injector.InjectField<Grab>(component, GetInjectionLookup(), GatherInjectables());
         }
 
         public static void Grab<T>(Action<T> afterInjectionFinished) {
