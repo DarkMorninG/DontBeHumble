@@ -54,7 +54,7 @@ namespace DBH.Injection {
             CurrentAssembly.Clear();
             InjectAdapters.Clear();
             MarkInjectionLookupDirty();
-            SceneManager.sceneLoaded += (scene, mode) => InjectScene(scene);
+            // SceneManager.sceneLoaded += (scene, mode) => InjectScene(scene);
             SceneManager.sceneUnloaded += AfterSceneUnload;
         }
 
