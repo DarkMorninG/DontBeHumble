@@ -304,7 +304,7 @@ namespace DBH.Injection {
         }
 
         private static IEnumerable<Object> GetComponentInActiveScene() {
-            var gameObjectsInScene = FindObjectsOfType<GameObject>();
+            var gameObjectsInScene = FindObjectsOfType<GameObject>(true);
             var unityObjects = Resources.FindObjectsOfTypeAll<ScriptableObject>();
 
             var components = GetComponentsFromGameObjects(gameObjectsInScene);
