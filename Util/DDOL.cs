@@ -10,8 +10,8 @@ namespace DBH.Util {
         [SerializeField]
         private DependencyInjector dependencyInjector;
 
-
-        public void Awake() {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public void Init() {
             if (_instance == null) {
                 _instance = this;
                 DontDestroyOnLoad(gameObject);
