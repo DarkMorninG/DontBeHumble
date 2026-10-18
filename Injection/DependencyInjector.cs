@@ -77,7 +77,7 @@ namespace DBH.Injection {
 
         public static void InjectScene(Scene scene) {
             InjectionFinished = false;
-            while (startUpFinished) {
+            while (!startUpFinished) {
                 Awaitable.EndOfFrameAsync();
             }
             var componentFromScene = GetComponentFromScene(scene).Distinct().ToList();
