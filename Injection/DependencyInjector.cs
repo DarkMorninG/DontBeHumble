@@ -36,7 +36,6 @@ namespace DBH.Injection {
         private static bool injectionLookupDirty = true;
 
         private static Config.Config currentConfig;
-        private static bool startupStarted;
 
         public static bool InjectionFinished { get; private set; }
 
@@ -54,37 +53,26 @@ namespace DBH.Injection {
             Controllers.Clear();
             CurrentAssembly.Clear();
             InjectAdapters.Clear();
-            startupStarted = false;
             InjectionFinished = false;
             MarkInjectionLookupDirty();
             SceneManager.sceneUnloaded += AfterSceneUnload;
         }
 
         public void StartUp() {
-            if (startupStarted) return;
-
-            startupStarted = true;
             InjectionFinished = false;
-            try {
-                currentConfig.AssemblysToScan.AddRange(assemblyName);
-                var components = GetComponentFromScene(gameObject.scene).Concat(GetComponentFromOpenedScene()).ToList();
-                RegisterControllers(components);
-                InstantiateBeans();
-                InjectAdapters.AddRange(FilterInjectorAdapters(Beans));
-                InjectFields<Grab>(components);
-                InvokePostConstructMethods(components);
-                InvokeAfterSceneLoading(GatherInjectables());
-                CallAfterInjection();
-                InjectionFinished = true;
-            } catch {
-                startupStarted = false;
-                throw;
-            }
+            currentConfig.AssemblysToScan.AddRange(assemblyName);
+            var components = GetComponentFromScene(gameObject.scene).Concat(GetComponentFromOpenedScene()).ToList();
+            RegisterControllers(components);
+            InstantiateBeans();
+            InjectAdapters.AddRange(FilterInjectorAdapters(Beans));
+            InjectFields<Grab>(components);
+            InvokePostConstructMethods(components);
+            InvokeAfterSceneLoading(GatherInjectables());
+            CallAfterInjection();
         }
 
 
         public static void InjectScene(Scene scene) {
-            EnsureStartupCalled();
             InjectionFinished = false;
             var componentFromScene = GetComponentFromScene(scene).Distinct().ToList();
             RegisterControllers(componentFromScene);
@@ -94,21 +82,6 @@ namespace DBH.Injection {
             InjectionFinished = true;
         }
 
-        private static void EnsureStartupCalled() {
-            if (startupStarted) return;
-
-            var dependencyInjector = FindObjectsByType<DependencyInjector>(
-                    FindObjectsInactive.Include,
-                    FindObjectsSortMode.None)
-                .FirstOrDefault();
-
-            if (dependencyInjector == null) {
-                throw new InvalidOperationException(
-                    $"{nameof(InjectScene)} requires a {nameof(DependencyInjector)} in a loaded scene.");
-            }
-
-            dependencyInjector.StartUp();
-        }
 
         private static void AfterSceneUnload(Scene scene) {
             if (Controllers.RemoveWhere(injectable => injectable.Inject == null) > 0) {
@@ -191,7 +164,7 @@ namespace DBH.Injection {
             injectionLookupDirty = false;
             return injectionLookup;
         }
-        
+
 
         private static void InvokeAfterSceneLoading(HashSet<Injectable> injectables) {
             foreach (var injectable in injectables) {
