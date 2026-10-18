@@ -2,8 +2,8 @@
 using DBH.Injection;
 using UnityEngine;
 
-namespace DBH.Util
-{
+namespace DBH.Util {
+    [DefaultExecutionOrder(-10001)]
     public class DDOL : DBHMono {
         private static DDOL _instance;
 
