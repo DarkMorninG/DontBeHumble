@@ -11,6 +11,7 @@ using DBH.Injection.dto;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 using Vault;
 using Vault.BetterCoroutine;
 using Object = UnityEngine.Object;
@@ -43,6 +44,7 @@ namespace DBH.Injection {
 
         public static event VoidNoParameter OnFinishedInjection;
 
+        private static bool startUpFinished = false;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         private static void Bootstrap() {
@@ -54,7 +56,6 @@ namespace DBH.Injection {
             CurrentAssembly.Clear();
             InjectAdapters.Clear();
             MarkInjectionLookupDirty();
-            // SceneManager.sceneLoaded += (scene, mode) => InjectScene(scene);
             SceneManager.sceneUnloaded += AfterSceneUnload;
         }
 
@@ -70,11 +71,15 @@ namespace DBH.Injection {
             InvokeAfterSceneLoading(GatherInjectables());
             CallAfterInjection();
             InjectionFinished = true;
+            startUpFinished = true;
         }
 
 
         public static void InjectScene(Scene scene) {
             InjectionFinished = false;
+            while (startUpFinished) {
+                Awaitable.EndOfFrameAsync();
+            }
             var componentFromScene = GetComponentFromScene(scene).Distinct().ToList();
             RegisterControllers(componentFromScene);
             InjectFields<Grab>(componentFromScene);
