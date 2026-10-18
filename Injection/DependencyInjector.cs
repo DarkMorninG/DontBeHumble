@@ -44,8 +44,6 @@ namespace DBH.Injection {
 
         public static event VoidNoParameter OnFinishedInjection;
 
-        private static bool startUpFinished = false;
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         private static void Bootstrap() {
             UnityThread.initUnityThread();
@@ -71,15 +69,11 @@ namespace DBH.Injection {
             InvokeAfterSceneLoading(GatherInjectables());
             CallAfterInjection();
             InjectionFinished = true;
-            startUpFinished = true;
         }
 
 
         public static void InjectScene(Scene scene) {
             InjectionFinished = false;
-            while (!startUpFinished) {
-                Awaitable.EndOfFrameAsync();
-            }
             var componentFromScene = GetComponentFromScene(scene).Distinct().ToList();
             RegisterControllers(componentFromScene);
             InjectFields<Grab>(componentFromScene);
