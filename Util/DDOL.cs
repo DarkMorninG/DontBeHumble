@@ -3,15 +3,14 @@ using DBH.Injection;
 using UnityEngine;
 
 namespace DBH.Util {
-    [DefaultExecutionOrder(-10001)]
+    [DefaultExecutionOrder(-10000)]
     public class DDOL : DBHMono {
         private static DDOL _instance;
 
         [SerializeField]
         private DependencyInjector dependencyInjector;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public void Init() {
+        public void Awake() {
             if (_instance == null) {
                 _instance = this;
                 DontDestroyOnLoad(gameObject);
